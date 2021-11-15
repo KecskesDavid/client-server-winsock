@@ -12,17 +12,32 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Net.Sockets;
+
 
 namespace client_ui
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
+        System.Net.Sockets.TcpClient clientSocket = new System.Net.Sockets.TcpClient();
+        NetworkStream serverStream = default(NetworkStream);
+
         public MainWindow()
         {
             InitializeComponent();
         }
+
+        public void ConnectButtonClick(object sender, EventArgs e)
+        {
+            clientSocket.Connect("127.0.0.1", 27015);
+
+            TextBlock statusTextBlock = (TextBlock)FindName("statusText");
+            TextBlock usernameTextBlock = (TextBlock)FindName("userNameText");
+            TextBox userNameTextBox = (TextBox)FindName("userNameTextBox");
+            statusTextBlock.Text = statusTextBlock.Text + "connected";
+            userNameText.Text = userNameText.Text + " " + userNameTextBox.Text;
+        }
+
+
     }
 }

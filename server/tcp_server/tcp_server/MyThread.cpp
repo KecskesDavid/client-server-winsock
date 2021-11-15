@@ -1,9 +1,9 @@
 #include "MyThread.h"
 
-using namespace std;
-
-MyThread::MyThread(SOCKET mSock, list<MyThread*>& threadList, CRITICAL_SECTION& criticalSession): threadList(threadList), criticalSession(criticalSession) {
+MyThread::MyThread(SOCKET mSock, std::list<MyThread*>& threadList, CRITICAL_SECTION& criticalSession): threadList(threadList), criticalSession(criticalSession) {
     this->mSock = mSock;
+    this->mSocketName = "";
+    this->mNumber = 0;
 }
 
 void MyThread::run() {
@@ -12,24 +12,21 @@ void MyThread::run() {
     char RecvBuf[BufLen] = {};
     char SendBuf[BufLen] = {};
 
-    iResult = recv(this->mSock, RecvBuf, BufLen, 0);
-
-    EnterCriticalSection(&this->criticalSession);
-    scanf_s("%s", SendBuf, sizeof(SendBuf));
-    for (auto thread = this->threadList.begin(); thread != threadList.end(); thread++) {
-        if ((*thread)->isExited()) {
-            delete* thread;
-            threadList.erase(thread);   
+    while (1) {
+        printf("Receiving message...\n");
+        iResult = recv(this->mSock, RecvBuf, BufLen, 0);
+        if (iResult == SOCKET_ERROR)
+        {
+            closesocket(this->mSock);
         }
-        else {
-            printf("%s", SendBuf);
-            iResult = send((*thread)->mSock, SendBuf, BufLen, 0);
-            if (iResult == SOCKET_ERROR)
-            {
-                printf("Hiba a kuldesnel a kovetkezo hibakoddal: %d\n", WSAGetLastError());
-                closesocket((*thread)->mSock);
+
+        EnterCriticalSection(&this->criticalSession);
+        for (auto thread = this->threadList.begin(); thread != threadList.end(); thread++) {
+            if ((*thread)->isExited()) {
+                delete* thread;
+                threadList.erase(thread);
             }
         }
+        LeaveCriticalSection(&this->criticalSession);
     }
-    LeaveCriticalSection(&this->criticalSession);
 }

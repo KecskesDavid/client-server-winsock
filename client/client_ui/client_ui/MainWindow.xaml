@@ -7,6 +7,37 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-        
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="73*"/>
+            <ColumnDefinition Width="125*"/>
+        </Grid.ColumnDefinitions>
+        <TextBox
+            Name="userNameTextBox"
+            Width="80"
+            Height="25" Margin="20,57,192,337"
+            />
+
+        <Button
+            Name="connectButton"
+            Width="80"
+            Height="25" 
+            Margin="117,57,95,337"
+            Click="ConnectButtonClick">
+            <TextBlock>
+                Connect
+            </TextBlock>
+        </Button>
+
+        <TextBlock
+            Name="statusText"
+            Margin="20,10,95,384">
+            Status:
+        </TextBlock>
+
+        <TextBlock
+            x:Name="userNameText"
+            Margin="20,32,109,362">
+            Username:
+        </TextBlock>
     </Grid>
 </Window>

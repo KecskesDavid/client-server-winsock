@@ -1,22 +1,24 @@
 #include <stdio.h>
+#include <list>
+
 #include "winsock2.h"
 #include "ws2tcpip.h"
 #include "MyThread.h"
 #include "SysThread.h"
 #include "synchapi.h"
-#include <list>
 #include "MyThread.h"
-// linking ws2_32.lib
-#pragma comment(lib, "Ws2_32.lib")
 
+#pragma comment(lib, "Ws2_32.lib")
 
 int main() {
 	printf("SERVER\n");
 	WSADATA wsaData;
 	SOCKET listenSocket;
 	int port = 27015;
+
 	// Initialize Winsock
 	WSAStartup(MAKEWORD(2, 2), &wsaData);
+
 	// Create a socket for sending data
 	listenSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	if (listenSocket == INVALID_SOCKET) {
@@ -66,10 +68,13 @@ int main() {
 		printf("Client connected successfully!\n");
 	}
 
-	printf("Finished sending. Closing socket.\n");
-	iResult = shutdown(listenSocket, SD_SEND);
-	//iResult = closesocket(ClientSocket);
+	printf("Closing.\n");
+	closesocket(acceptSocket);
+
 	printf("Exiting.\n");
+	iResult = shutdown(listenSocket, SD_SEND);
+
+	printf("Cleanup.\n");
 	WSACleanup();
 	return 0;
 }
