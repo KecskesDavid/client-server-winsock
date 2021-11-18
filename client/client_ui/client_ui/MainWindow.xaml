@@ -5,23 +5,15 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:client_ui"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="533" Width="796">
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="73*"/>
-            <ColumnDefinition Width="125*"/>
-        </Grid.ColumnDefinitions>
         <TextBox
-            Name="userNameTextBox"
-            Width="80"
-            Height="25" Margin="20,57,192,337"
+            Name="userNameTextBox" Margin="20,61,663,413"
             />
 
         <Button
-            Name="connectButton"
-            Width="80"
-            Height="25" 
-            Margin="117,57,95,337"
+            Name="connectButton" 
+            Margin="130,61,558,413"
             Click="ConnectButtonClick">
             <TextBlock>
                 Connect
@@ -30,14 +22,45 @@
 
         <TextBlock
             Name="statusText"
-            Margin="20,10,95,384">
+            Margin="20,10,95,469">
             Status:
         </TextBlock>
 
         <TextBlock
             x:Name="userNameText"
-            Margin="20,32,109,362">
+            Margin="20,33,95,446">
             Username:
         </TextBlock>
+
+        <ListBox 
+            Name="chatBox"
+            Margin="20,104,232,219"
+            Background="AliceBlue"/>
+
+        <TextBox
+            Name="messageTextBox"
+            Margin="20,358,337,116"/>
+
+        <Button
+            x:Name="sendButton" 
+            Margin="456,358,232,116"
+            Click="SendButtonClick">
+            <TextBlock>
+                Send
+            </TextBlock>
+        </Button>
+
+        <TextBlock
+            Margin="20,331,109,146"><Run Text="Message:"/></TextBlock>
+
+        <TextBox
+            Name="senderNameText" Margin="346,303,337,171" Visibility="Hidden"      />
+
+        <ComboBox Name="messageTypeSelector" Margin="456,303,232,171" RenderTransformOrigin="2.265,-0.857"
+                  SelectionChanged="SelectionChangedHandler">
+            <ComboBoxItem IsSelected="True" Name="Public">Public</ComboBoxItem>
+            <ComboBoxItem Name="Private">Private</ComboBoxItem>
+            <ComboBoxItem Name="Group">Group</ComboBoxItem>
+        </ComboBox>
     </Grid>
 </Window>
