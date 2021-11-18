@@ -104,11 +104,11 @@ namespace client_ui
         {
             return new StringBuilder()
                 .Append((int)requestType) // Firstly the type of request
-                .Append("/")
+                .Append("|")
                 .Append(sender) // Then the sender
-                .Append("/")
+                .Append("|")
                 .Append(receiver) // Then the receiver(s)
-                .Append("/")
+                .Append("|")
                 .Append(message)
                 .ToString(); // Then the message itself
         }

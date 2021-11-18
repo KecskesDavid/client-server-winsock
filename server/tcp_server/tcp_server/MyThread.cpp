@@ -7,10 +7,10 @@ MyThread::MyThread(SOCKET mSock, std::list<MyThread*>& threadList, CRITICAL_SECT
     this->mNumber = 0;
 }
 
-void splitRequest(int& requestType, std::string sender, char* receiver, char* message, char* RecvBuf, int BufLen) {
+void splitRequest(int& requestType, std::string& sender, std::string& receiver, std::string& message, char* RecvBuf, int BufLen) {
     int splitCase = 0;
     for (int i = 0; i < BufLen; i++) {
-        if (RecvBuf[i] == '/') {
+        if (RecvBuf[i] == '|') {
             splitCase++;
             continue;
         }
@@ -20,14 +20,22 @@ void splitRequest(int& requestType, std::string sender, char* receiver, char* me
 
         switch (splitCase)
         {
-        case 0: requestType = (int)RecvBuf[i];
-        case 1: sender += RecvBuf[i];
-        case 2: receiver += RecvBuf[i];
-        case 3: message += RecvBuf[i];
+        case 0: requestType = (int)RecvBuf[i] - 48; break;
+        case 1: sender.append(1, RecvBuf[i]); break;
+        case 2: receiver.append(1, RecvBuf[i]); break;
+        case 3: message.append(1, RecvBuf[i]); break;
         default:
             break;
         }
     }
+}
+
+void printMessage(int requestType, std::string& sender, std::string& receiver, std::string& message) {
+    printf("Message...\n");
+    std::cout << "request type: " << requestType << std::endl;
+    std::cout << "sender: " << sender << std::endl;
+    std::cout << "receiver: " << receiver << std::endl;
+    std::cout << "message: " << message << std::endl << std::endl;
 }
 
 void MyThread::run() {
@@ -46,16 +54,11 @@ void MyThread::run() {
 
         int requestType;
         std::string sender;
-        char receiver[BufLen] = {};
-        char message[BufLen] = {};
+        std::string receiver;
+        std::string message;
 
         splitRequest(requestType, sender, receiver, message, RecvBuf, BufLen);
-
-        printf("Message...\n");
-        printf("%d\n", requestType);
-        printf("%\n", sender);
-        printf("%S\n", receiver);
-        printf("%S\n", message);
+        printMessage(requestType, sender, receiver, message);
 
         EnterCriticalSection(&this->criticalSession);
         for (auto thread = this->threadList.begin(); thread != threadList.end(); thread++) {
