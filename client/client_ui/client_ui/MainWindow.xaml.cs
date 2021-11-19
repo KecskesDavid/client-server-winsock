@@ -18,9 +18,10 @@ public enum RequestType
 {
     CREATE_SOCKET = 0,
 	CREATE_GROUP = 1,
-	SEND_PUBLIC = 3,
-	SEND_GROUP = 4,
-	SEND_PRIVATE = 5
+	SEND_PUBLIC = 2,
+	SEND_GROUP = 3,
+	SEND_PRIVATE = 4,
+    ADD_TO_GROUP = 5,
 }
 
 namespace client_ui
