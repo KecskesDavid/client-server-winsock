@@ -39,7 +39,7 @@ void MyThread::sendUsernames()
     }
 }
 
-std::string MyThread::createGroupResponse(std::string groupName) {
+std::string MyThread::createGroupMessage(std::string groupName) {
     return "GROUP >> You have successfully created the group: " + groupName;
 }
 
@@ -50,7 +50,7 @@ void MyThread::createGroup(std::string groupName, std::string sender) {
     this->groupMember.insert(this);
     this->groupName = groupName;
 
-    std::string responseMessage = createGroupResponse(groupName);
+    std::string responseMessage = createGroupMessage(groupName);
     if (send(this->mSock, responseMessage.c_str(), responseMessage.length(), 0) == SOCKET_ERROR)
     {
         printf("Hiba a kuldesnel a kovetkezo hibakoddal: %d\n", WSAGetLastError());
@@ -61,7 +61,7 @@ void MyThread::createGroup(std::string groupName, std::string sender) {
 
 
 //-------------- Create response if the user is succesfully added --------------//
-std::string MyThread::createSuccessfullyAddedToGroup(std::string groupName) {
+std::string MyThread::createSuccessfullyAddedToGroupMessage(std::string groupName) {
     return "GROUP >> You have been successfully added to the group: " + groupName;
 }
 
@@ -72,7 +72,7 @@ void MyThread::addMemberToGroup(std::string groupName, std::string receiver)
         if (x->mSocketName == receiver) {
             // Adding the member to the group
             x->groupName = groupName;
-            std::string message = createSuccessfullyAddedToGroup(groupName);
+            std::string message = createSuccessfullyAddedToGroupMessage(groupName);
             if (send(x->mSock, message.c_str(), message.length(), 0) == SOCKET_ERROR)
             {
                 printf("Hiba a kuldesnel a kovetkezo hibakoddal: %d\n", WSAGetLastError());
