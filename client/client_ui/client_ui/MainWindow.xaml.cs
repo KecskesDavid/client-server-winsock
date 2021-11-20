@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Net.Sockets;
+using System.Threading;
 
 public enum RequestType
 {
@@ -49,9 +50,66 @@ namespace client_ui
 
         private void SendButtonClick(object sender, RoutedEventArgs e)
         {
-            NetworkStream serverStream = _clientSocket.GetStream();
+            ComboBox messageTypeSelector = (ComboBox)FindName("messageTypeSelector");
+            ComboBoxItem selectedType = (ComboBoxItem)messageTypeSelector.SelectedItem;
 
-            byte[] outStream = System.Text.Encoding.ASCII.GetBytes("Valami");
+            switch (selectedType.Name)
+            {
+                case "Public": publicMessage(); break;
+                case "Private": privateMessage(); break;
+                case "Group": groupMessage(); break;
+            }
+        }
+
+        private void AddToGroupButton(object sender, RoutedEventArgs e)
+        {
+            NetworkStream serverStream = _clientSocket.GetStream();
+            TextBox groupName = (TextBox)FindName("receiverNameText");
+            TextBox newMember = (TextBox)FindName("addMemberText");
+
+            byte[] outStream = System.Text.Encoding.ASCII.GetBytes(createOutStream(RequestType.ADD_TO_GROUP, "", newMember.Text, groupName.Text));
+            serverStream.Write(outStream, 0, outStream.Length);
+            serverStream.Flush();
+        }
+
+        private void CreateGroupButtonClick(object sender, RoutedEventArgs e)
+        {
+            NetworkStream serverStream = _clientSocket.GetStream();
+            TextBox groupName = (TextBox)FindName("receiverNameText");
+
+            byte[] outStream = System.Text.Encoding.ASCII.GetBytes(createOutStream(RequestType.CREATE_GROUP, _username, "", groupName.Text));
+            serverStream.Write(outStream, 0, outStream.Length);
+            serverStream.Flush();
+        }
+
+        private void privateMessage()
+        {
+            NetworkStream serverStream = _clientSocket.GetStream();
+            TextBox message = (TextBox)FindName("messageTextBox");
+            TextBox receiver = (TextBox)FindName("receiverNameText");
+
+            byte[] outStream = System.Text.Encoding.ASCII.GetBytes(createOutStream(RequestType.SEND_PRIVATE, _username, receiver.Text, message.Text));
+            serverStream.Write(outStream, 0, outStream.Length);
+            serverStream.Flush();
+        }
+
+        private void publicMessage()
+        {
+            NetworkStream serverStream = _clientSocket.GetStream();
+            TextBox message = (TextBox)FindName("messageTextBox");
+
+            byte[] outStream = System.Text.Encoding.ASCII.GetBytes(createOutStream(RequestType.SEND_PUBLIC, _username, "", message.Text));
+            serverStream.Write(outStream, 0, outStream.Length);
+            serverStream.Flush();
+        }
+
+        private void groupMessage()
+        {
+            NetworkStream serverStream = _clientSocket.GetStream();
+            TextBox message = (TextBox)FindName("messageTextBox");
+            TextBox receiver = (TextBox)FindName("receiverNameText");
+
+            byte[] outStream = System.Text.Encoding.ASCII.GetBytes(createOutStream(RequestType.SEND_GROUP, _username, receiver.Text, message.Text));
             serverStream.Write(outStream, 0, outStream.Length);
             serverStream.Flush();
         }
@@ -75,6 +133,54 @@ namespace client_ui
 
             serverStream.Write(outStream, 0, outStream.Length);
             serverStream.Flush();
+
+            Thread _thread = new Thread(receiveMessages);
+            _thread.Start();
+        }
+
+        private void receiveMessages()
+        {
+            string receivedMessage;
+
+            while (true)
+            {
+                var buffersize = _clientSocket.ReceiveBufferSize;
+                byte[] instream = new byte[buffersize];
+
+                _serverStream = _clientSocket.GetStream();
+                _serverStream.Read(instream, 0, buffersize);
+                receivedMessage = System.Text.Encoding.ASCII.GetString(instream);
+
+                this.Dispatcher.Invoke(() =>
+                {
+                    // If the first character of the message is # then a list of name is sent
+                    if (receivedMessage[0] == '#') {
+                        displayUserNames(receivedMessage);
+                    }
+                    else
+                    {
+                        updateChatBox(receivedMessage);
+                    }
+                });
+            }
+        }
+
+        private void updateChatBox(string receivedMessage)
+        {
+            ListBox chatBox = (ListBox)FindName("chatBox");
+            chatBox.Items.Add(receivedMessage);
+        }
+
+        private void displayUserNames(string receivedMessage)
+        {
+            receivedMessage = receivedMessage.Replace("#", "");
+            string[] listOfNames = receivedMessage.Split('|');
+            ListBox userNameBox = (ListBox)FindName("userNameBox");
+            userNameBox.Items.Clear();
+            for (int i = 0; i < listOfNames.Length; i++)
+            {
+                userNameBox.Items.Add(listOfNames[i]);
+            }
         }
 
         /// Ui changes after the connection to the server
@@ -91,13 +197,34 @@ namespace client_ui
         /// Makes the sender text box visible/hidden 
         private void setupSenderText(string selectedItem)
         {
-            TextBox senderName = (TextBox)FindName("senderNameText");
+            // TODO block send button until sender name is completed
+            TextBox senderName = (TextBox)FindName("receiverNameText");
+            Button addToGroupButton = (Button)FindName("addToGroupButton");
+            Button createGroupButton = (Button)FindName("createGroupButton");
+            TextBox newMemberName = (TextBox)FindName("addMemberText");
+            TextBlock newMemberText = (TextBlock)FindName("newMemberText");
+            TextBlock groupNameText = (TextBlock)FindName("groupNameText");
             if (selectedItem == "Private" || selectedItem == "Group")
             {
                 senderName.Visibility = Visibility.Visible;
             } else
             {
                 senderName.Visibility = Visibility.Hidden;
+            }
+            if(selectedItem == "Group")
+            {
+                addToGroupButton.Visibility = Visibility.Visible;
+                newMemberName.Visibility = Visibility.Visible;
+                newMemberText.Visibility = Visibility.Visible;
+                groupNameText.Visibility = Visibility.Visible;
+                createGroupButton.Visibility = Visibility.Visible;
+            } else
+            {
+                addToGroupButton.Visibility = Visibility.Hidden;
+                newMemberName.Visibility = Visibility.Hidden;
+                newMemberText.Visibility = Visibility.Hidden;
+                groupNameText.Visibility = Visibility.Hidden;
+                createGroupButton.Visibility = Visibility.Hidden;
             }
         }
 

@@ -37,13 +37,17 @@
             Margin="20,104,232,219"
             Background="AliceBlue"/>
 
+        <ListBox 
+            Name="userNameBox"
+            Margin="593,104,42,98"/>
+
         <TextBox
             Name="messageTextBox"
-            Margin="20,358,337,116"/>
+            Margin="20,376,337,98"/>
 
         <Button
             x:Name="sendButton" 
-            Margin="456,358,232,116"
+            Margin="456,376,232,98"
             Click="SendButtonClick">
             <TextBlock>
                 Send
@@ -51,12 +55,37 @@
         </Button>
 
         <TextBlock
-            Margin="20,331,109,146"><Run Text="Message:"/></TextBlock>
+            Margin="20,351,109,126"><Run Text="Message:"/></TextBlock>
 
         <TextBox
-            Name="senderNameText" Margin="346,303,337,171" Visibility="Hidden"      />
+            Name="receiverNameText" Margin="125,318,558,156" Visibility="Visible"/>
 
-        <ComboBox Name="messageTypeSelector" Margin="456,303,232,171" RenderTransformOrigin="2.265,-0.857"
+        <TextBox
+            Name="addMemberText" Margin="340,318,343,156" Visibility="Visible"/>
+
+        <Button
+            x:Name="addToGroupButton" 
+            Margin="450,318,238,156"
+            Visibility="Visible"
+            Click="AddToGroupButton">
+            <TextBlock><Run Text="Add to group"/></TextBlock>
+        </Button>
+        
+        <Button
+            x:Name="createGroupButton" 
+            Margin="235,318,453,156"
+            Click="CreateGroupButtonClick">
+            <TextBlock><Run Text="Create group"/></TextBlock>
+        </Button>
+
+        <TextBlock
+            Name ="newMemberText"
+            Margin="340,293,343,184" Text="New member:" Visibility="Visible"/>
+        <TextBlock
+            Name ="groupNameText"
+            Margin="125,293,558,184" Text="Group name:" Visibility="Visible"/>
+
+        <ComboBox Name="messageTypeSelector" Margin="20,318,668,156" RenderTransformOrigin="2.265,-0.857"
                   SelectionChanged="SelectionChangedHandler">
             <ComboBoxItem IsSelected="True" Name="Public">Public</ComboBoxItem>
             <ComboBoxItem Name="Private">Private</ComboBoxItem>
